@@ -1,0 +1,35 @@
+{
+    "configurations": [
+        {
+            "name": "Win32",
+            "includePath": [
+                "${workspaceFolder}/**",
+                "C:/Users/mrexh/opencv/build/include"
+            ],
+            "defines": [
+                "_DEBUG",
+                "UNICODE",
+                "_UNICODE"
+            ],
+            "windowsSdkVersion": "10.0.19041.0",
+            "compilerPath": "cl.exe",
+            "cStandard": "c17",
+            "cppStandard": "c++17",
+            "intelliSenseMode": "windows-msvc-x64",
+            "configurationProvider": "ms-vscode.cmake-tools",
+            "browse": {
+                "path": [
+                    "C:/Users/mrexh/opencv/build/include"
+                ]
+            },
+            "compilerArgs": [
+                "-I C:\\Users\\mrexh\\opencv\\build\\include",
+                "-L C:\\Users\\mrexh\\opencv\\build\\x64\\vc16\\lib",
+                "-lopencv_core",
+                "-lopencv_highgui",
+                "-lopencv_imgproc"
+            ]
+        }
+    ],
+    "version": 4
+}

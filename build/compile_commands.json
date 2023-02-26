@@ -1,0 +1,8 @@
+[
+{
+  "directory": "C:/Users/mrexh/Code/Image-to-ASCII/build",
+  "command": "C:/msys64/mingw64/bin/g++.exe  @CMakeFiles/ASCII_Converter.dir/includes_CXX.rsp -g -std=gnu++11 -o CMakeFiles/ASCII_Converter.dir/convert-to-ascii.cpp.obj -c C:/Users/mrexh/Code/Image-to-ASCII/convert-to-ascii.cpp",
+  "file": "C:/Users/mrexh/Code/Image-to-ASCII/convert-to-ascii.cpp",
+  "output": "CMakeFiles/ASCII_Converter.dir/convert-to-ascii.cpp.obj"
+}
+]
