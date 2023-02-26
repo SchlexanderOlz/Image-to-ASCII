@@ -1,8 +1,13 @@
 from PIL import Image
 import os
+import cv2
+import random
 
 
-GEN_BRIGTHNESS = list("$@B%8&WM#*oahkbdpqwmZO0QLCJUYXzcvunxrjft/\|()1{}[]?-_+~<>i!lI;:,\"^`'.    ")
+
+
+GEN_BRIGTHNESS = list(' .`^"\',:;Il!i<>~+_--?][}{1)(|/\tfjrxnucvzXYUJCLQ0OZmwqpdcbkha*#MW&8%B@$@')
+MATRIX_SYMBOLS = list('ﾊﾐﾋｰｳｼﾅﾓﾆｻﾜﾂｵﾘｱﾎﾃﾏｹﾒｴｶｷﾑﾕﾗｾﾈｽﾀﾇﾍｦｲｸｺｿﾁﾄﾉﾌﾔﾖﾙﾚﾛﾝ012345789:・."=*+-<>日日日日')
 
 
 class ConvertToASCII:
@@ -12,7 +17,8 @@ class ConvertToASCII:
     
     def get_user_action(self):
         print("Welcome to the string to ASCII converter\nWhat do you want to "
-               "do?\n1. Convert from image\n2. Convert from video\n3. Change previous image/video")
+               "do?\n1. Convert from image\n2. Convert from video\n3. Convert from a live camera\n"
+               "4. Change previous image/video\n")
         
         try:
             action = int(input())
@@ -27,10 +33,16 @@ class ConvertToASCII:
         path = input()
 
         if action == 1:
-            conv_img = self.convert_from_picture(path)
+            try:
+                img = Image.open(path)
+            except: # TODO Add specific error occuring when not found
+                return
+            conv_img = self.convert_from_picture(img)
         elif action == 2:
             conv_img = self.convert_from_video(path)
         elif action == 3:
+            self.convert_from_stream(color='white', matrix=False)
+        elif action == 4:
             self.change_prev_img()
         else:
             print("\033[91m" + "Unallowed action" + "\033[0m") # --> Prints in red
@@ -46,18 +58,33 @@ class ConvertToASCII:
     def convert_from_video(self, path, size=(100, 100)): # G:\Bilder\2003\2_Kaarlalm03\122_2241.JPG
         pass
     
-    def convert_from_picture(self, path, size=None):
-        try:
-            img = Image.open(path)
-        except: # TODO Add specific error occuring when not found
-            return
+    def convert_from_stream(self, device=0, color='white', matrix=False):
+        
+        capture = cv2.VideoCapture(device)
+        
+        while True:
+            ret, frame = capture.read()
+            
+            if ret:
+                frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+                img = Image.fromarray(frame)
+                if color == 'green':
+                    print('\033[32m' + self.convert_from_picture(img, matrix=matrix) + 10 * '\n' + '\033[0m')
+                elif color == 'white':
+                    print(20 * '\n' + self.convert_from_picture(img, matrix=matrix))
+                
+                if cv2.waitKey(1) == ord('q'):
+                    break
+            else:
+                break
+    
+    def convert_from_picture(self, img:Image.Image, size=None, matrix=False):
         
         if size is None:
             size = (int((img.width / img.height) * 100) * 2, 100)
 
         img = img.convert('L')
         img = img.resize(size)
-
 
         pixels = []
         
@@ -69,7 +96,11 @@ class ConvertToASCII:
                 elif val == 255:
                     pixels.append(GEN_BRIGTHNESS[0])
                 else:
-                    pixels.append(GEN_BRIGTHNESS[(len(GEN_BRIGTHNESS) - 1) // (255 // val )]) # --> max Wert 255 = Weiß -> Erstes Element von GEN_BRIGHTNESS -> len(GEN_BRIGHTNESS) / (255 / sum(img.getpixels((x, y) / 3)))
+                    if matrix and random.randint(0, 2) == 1 and val > 120:
+                        pixels.append(random.choice(MATRIX_SYMBOLS)) # --> max Wert 255 = Weiß -> Erstes Element von GEN_BRIGHTNESS -> len(GEN_BRIGHTNESS) / (255 / sum(img.getpixels((x, y) / 3)))
+                    else:
+                        pixels.append(GEN_BRIGTHNESS[(len(GEN_BRIGTHNESS) - 1) // (255 // val )])
+
             pixels.append("\n")
         
         return ''.join(pixels)
@@ -89,6 +120,7 @@ class ConvertToASCII:
             
     def change_prev_img(self):
         pass
+
 
         
 if __name__ == "__main__":
