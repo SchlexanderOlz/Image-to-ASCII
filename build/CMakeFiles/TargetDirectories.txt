@@ -1,3 +1,0 @@
-C:/Users/mrexh/Code/Image-to-ASCII/build/CMakeFiles/ASCII_Converter.dir
-C:/Users/mrexh/Code/Image-to-ASCII/build/CMakeFiles/edit_cache.dir
-C:/Users/mrexh/Code/Image-to-ASCII/build/CMakeFiles/rebuild_cache.dir
