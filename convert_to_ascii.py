@@ -2,8 +2,7 @@ from PIL import Image
 import os
 import cv2
 import random
-
-
+import time
 
 
 GEN_BRIGTHNESS = list(' .`^"\',:;Il!i<>~+_--?][}{1)(|/\tfjrxnucvzXYUJCLQ0OZmwqpdcbkha*#MW&8%B@$@')
@@ -77,6 +76,7 @@ class ConvertToASCII:
                     break
             else:
                 break
+            
     
     def convert_from_picture(self, img:Image.Image, size=None, matrix=False):
         
