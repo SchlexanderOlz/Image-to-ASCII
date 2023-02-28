@@ -5,14 +5,20 @@ import random
 import time
 
 
-GEN_BRIGTHNESS = list(' .`^"\',:;Il!i<>~+_--?][}{1)(|/\tfjrxnucvzXYUJCLQ0OZmwqpdcbkha*#MW&8%B@$@')
-MATRIX_SYMBOLS = list('ﾊﾐﾋｰｳｼﾅﾓﾆｻﾜﾂｵﾘｱﾎﾃﾏｹﾒｴｶｷﾑﾕﾗｾﾈｽﾀﾇﾍｦｲｸｺｿﾁﾄﾉﾌﾔﾖﾙﾚﾛﾝ012345789:・."=*+-<>日日日日')
+GEN_BRIGTHNESS = list('                  ....`^"\',:;Il!i<>~+_--?][}{1)(|/\tfjrxnucvzXYUJCLQ0OZmwqpdcbkha*#MW&8%B@$@')
+LEN_GEN_BRIGHT = len(GEN_BRIGTHNESS)
+temp = list('   ﾊﾐﾋｰ ｳｼﾅﾓﾆｻﾜﾂｵﾘ ｱﾎﾃﾏｹﾒｴｶｷﾑﾕﾗｾﾈｽ ﾀﾇﾍｦｲｸｺｿﾁﾄﾉﾌﾔﾖﾙﾚﾛﾝ012345789:・."=*+-<>日')
+random.shuffle(temp)
+MATRIX_SYMBOLS = temp
+LEN_MATRIX = len(MATRIX_SYMBOLS)
 
 
 class ConvertToASCII:
     
     def __init__(self) -> None:
-        pass
+        self.last_mat = []
+        self.mat_frq = 300
+        self.curr_freq = 0
     
     def get_user_action(self):
         print("Welcome to the string to ASCII converter\nWhat do you want to "
@@ -40,7 +46,7 @@ class ConvertToASCII:
         elif action == 2:
             conv_img = self.convert_from_video(path)
         elif action == 3:
-            self.convert_from_stream(color='white', matrix=False)
+            self.convert_from_stream(color='white', matrix=True)
         elif action == 4:
             self.change_prev_img()
         else:
@@ -68,9 +74,9 @@ class ConvertToASCII:
                 frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
                 img = Image.fromarray(frame)
                 if color == 'green':
-                    print('\033[32m' + self.convert_from_picture(img, matrix=matrix) + 10 * '\n' + '\033[0m')
+                    print(20 * '\n' +  '\033[32m' + self.convert_from_picture(img, matrix=matrix, size=(180, 60)) + '\033[0m')
                 elif color == 'white':
-                    print(20 * '\n' + self.convert_from_picture(img, matrix=matrix))
+                    print(20 * '\n' + self.convert_from_picture(img, matrix=matrix, size=(180, 60)))
                 
                 if cv2.waitKey(1) == ord('q'):
                     break
@@ -87,20 +93,26 @@ class ConvertToASCII:
         img = img.resize(size)
 
         pixels = []
+
+        if matrix:
+            self.calc_new_mat(*size)
         
         for y in range(img.height):
+            row = []
             for x in range(img.width):
                 val = img.getpixel((x, y))
                 if val == 0:
-                    pixels.append(GEN_BRIGTHNESS[-1])
+                    row.append(GEN_BRIGTHNESS[-1])
                 elif val == 255:
-                    pixels.append(GEN_BRIGTHNESS[0])
+                    row.append(GEN_BRIGTHNESS[0])
+                elif matrix and val > 180:
+                    row.append(self.last_mat[x][y])
+                    
+                    #pixels.append(MATRIX_SYMBOLS) # --> max Wert 255 = Weiß -> Erstes Element von GEN_BRIGHTNESS -> len(GEN_BRIGHTNESS) / (255 / sum(img.getpixels((x, y) / 3)))
                 else:
-                    if matrix and random.randint(0, 2) == 1 and val > 120:
-                        pixels.append(random.choice(MATRIX_SYMBOLS)) # --> max Wert 255 = Weiß -> Erstes Element von GEN_BRIGHTNESS -> len(GEN_BRIGHTNESS) / (255 / sum(img.getpixels((x, y) / 3)))
-                    else:
-                        pixels.append(GEN_BRIGTHNESS[(len(GEN_BRIGTHNESS) - 1) // (255 // val )])
+                    row.append(GEN_BRIGTHNESS[(LEN_GEN_BRIGHT - 1) // (255 // val )])
 
+            pixels.append(''.join(row))
             pixels.append("\n")
         
         return ''.join(pixels)
@@ -121,8 +133,32 @@ class ConvertToASCII:
     def change_prev_img(self):
         pass
 
+    def calc_new_mat(self, size_x, size_y):
+        tmp = []
 
-        
+        first_line = self.last_mat == []
+
+        if self.curr_freq != 0:
+            if self.curr_freq == self.mat_frq:
+                self.curr_freq = 0
+            else:
+                self.curr_freq += 1
+            return
+
+
+        #len_mat = len(self.last_mat)
+        for x in range(size_x):
+            if first_line:
+                last_val = random.choice(MATRIX_SYMBOLS)
+            else:
+                last_val = MATRIX_SYMBOLS[(MATRIX_SYMBOLS.index(self.last_mat[x][0]) + 1) % LEN_MATRIX]
+            
+            tmp.append([last_val])
+            for y in range(size_y):
+                tmp[x].append(MATRIX_SYMBOLS[(MATRIX_SYMBOLS.index(last_val) + y + 1) % LEN_MATRIX])
+
+        self.last_mat = tmp
+
 if __name__ == "__main__":
     inst = ConvertToASCII()
     
